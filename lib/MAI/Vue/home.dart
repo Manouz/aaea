@@ -1,12 +1,9 @@
-//import 'package:aaea/quiz/controleur.dart';
-
-
+import 'package:aaea/MAI/Models/quiz.dart';
+import 'package:aaea/MAI/Models/result.dart';
 import 'package:flutter/material.dart';
-import '../Models/answer.dart';
-import '../Models/questions.dart';
 
 class QWIZ extends StatefulWidget {
-   QWIZ({super.key});
+  QWIZ({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -17,27 +14,53 @@ class QWIZ extends StatefulWidget {
 }
 
 class QWIZState extends State<QWIZ> {
-  var qi = 1;
-  List<Map<String,Object>> questions = [
+  var _totalScore = 0;
+  var _qi = 0;
+
+  void _resetQuiz() {
+    setState(() {
+      var _totalScore = 0;
+      var _qi = 0;
+    });
+  }
+
+  final List<Map<String, Object>> _questions = [
     {
-      'questionText':'Quel est ta couleur préférée',
-      'answers':["Blue","Green","Yellow","pink"]
+      'questionText': 'Quel est ta couleur préférée',
+      'answers': [
+        {"text": "Blue", "Score": 10},
+        {"text": "Green", "Score": 10},
+        {"text": "Yellow", "Score": 10},
+        {"text": "pink", "Score": 10}
+      ]
     },
     {
-      'questionText':"Quels sont les temps verbaux",
-      'answers':["présent","Passé","Future","L'Imparfais"]
+      'questionText': "Quels sont les temps verbaux",
+      'answers': [
+        {"text": "présent", "Score": 10},
+        {"text": "Passé", "Score": 10},
+        {"text": "Future", "Score": 10},
+        {"text": "L'Imparfais", "Score": 10}
+      ]
     },
     {
-      'questionText':"Comment se nomme l'homme le plus petit du monde ? ",
-      'answers':["yiyi","Moli","Future","pink"]
+      'questionText': "Comment se nomme l'homme le plus petit du monde ? ",
+      'answers': [
+        {"text": "yiyi", "Score": 10},
+        {"text": "Moli", "Score": 10},
+        {"text": "Future", "Score": 10},
+        {"text": "pink", "Score": 10}
+      ]
     },
   ];
-  answerQuestion() {
+
+  void _answerQuestion(int score) {
+    _totalScore = _totalScore + score;
     setState(() {
-      qi = qi + 1;
+      _qi = _qi + 1;
     });
     //print(qi);
-     if (qi < questions.length) {
+    if (_qi < _questions.length) {
       print('We have more questions!');
     } else {
       print('No more questions!');
@@ -47,19 +70,28 @@ class QWIZState extends State<QWIZ> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: qi<questions.length ?
-       Column(
-        //ici nous avons une liste de widget
-        children: [
-          Questionn((questions[qi]['questionTest'])as String),
-          //On veut transformer la liste en quelque chose de simple
-          //La méthohe map exécute une fonction qui recois un parametre et sera exécuté pour tous les elmts de la liste questions
-          ...(questions[qi]['answers']as List<String>).map((answer) {
-            return Answer(answerQuestion,answer);
-          }).toList()
-        ],
-      ):Center(child: Text("TU VOIS?"),)
-    );
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        body: _qi < _questions.length
+            ? Q(
+                questions: _questions,
+                answerQuestion: _answerQuestion,
+                qi: _qi,
+              )
+            : Result(
+                resultScore: _totalScore,
+                reset: _resetQuiz,
+              ));
   }
 }
